@@ -1,0 +1,81 @@
+import pandas as pd
+from datetime import datetime
+
+class BakeryManagementSystem:
+    def __init__(self):                                                                # constructor method 
+        self.orders = pd.DataFrame(columns=['OrderID', 'Name', 'Order', 'Date'])
+
+    def add_order(self, name, order, date):
+        order_id = len(self.orders) + 1
+        self.orders = self.orders.append({'OrderID': order_id, 'Name': name, 'Order': order, 'Date': date}, ignore_index=True)
+        print("Order added successfully!")
+
+    def view_orders(self):
+        print("\n--- All Orders ---\n")
+        print(self.orders)
+
+    def update_order(self, order_id, name=None, order=None, date=None):
+        if order_id not in self.orders['OrderID'].values:
+            print("Order ID not found!")
+            return
+        
+        if name:
+            self.orders.loc[self.orders['OrderID'] == order_id, 'Name'] = name
+        if order:
+            self.orders.loc[self.orders['OrderID'] == order_id, 'Order'] = order
+        if date:
+            self.orders.loc[self.orders['OrderID'] == order_id, 'Date'] = date
+        
+        print("Order updated successfully!")
+
+    def save_to_excel(self, filename):
+        self.orders.to_excel(filename, index=False)
+        print("Data saved to", filename)
+
+def main():
+    bakery_system = BakeryManagementSystem()
+
+    while True:
+        print("\n=== Bakery Management System ===")
+        print("1. Add Order")
+        print("2. View Orders")
+        print("3. Update Order")
+        print("4. Save to Excel")
+        print("5. Exit")
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            name = input("Enter customer name: ")
+            order = input("Enter order details: ")
+            date = input("Enter order date (YYYY-MM-DD): ")
+            try:
+                date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+                bakery_system.add_order(name, order, date_obj)
+            except ValueError:
+                print("Invalid date format! Please use YYYY-MM-DD.")
+        elif choice == '2':
+            bakery_system.view_orders()
+        elif choice == '3':
+            order_id = int(input("Enter Order ID to update: "))
+            name = input("Enter updated customer name (press Enter to skip): ")
+            order = input("Enter updated order details (press Enter to skip): ")
+            date = input("Enter updated order date (YYYY-MM-DD) (press Enter to skip): ")
+            try:
+                if date:
+                    date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+                else:
+                    date_obj = None
+                bakery_system.update_order(order_id, name, order, date_obj)
+            except ValueError:
+                print("Invalid date format! Please use YYYY-MM-DD.")
+        elif choice == '4':
+            filename = input("Enter filename to save: ")
+            bakery_system.save_to_excel(filename)
+        elif choice == '5':
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice! Please try again.")
+
+if __name__ == "__main__":
+    main()
